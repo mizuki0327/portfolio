@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Pavilion Gallery</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="五月祭パビリオン制作風景ギャラリー">
+  <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
+  <style>
+    body{font-family:system-ui, sans-serif;margin:0;background:#f9f9f9}
+    header{padding:2rem 1rem;text-align:center}
+    h1{margin:0;font-size:clamp(1.5rem,4vw,2.2rem)}
+    .grid{display:grid;gap:8px;padding:0 8px;
+          grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+    .grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
+    footer{font-size:.8rem;text-align:center;padding:2rem 0;color:#666}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Pavilion Gallery</h1>
+  <p>2025 五月祭 &bull; Construction snapshots</p>
+</header>
+
+<main class="grid" id="gallery"></main>
+
+<footer>
+  &copy; 2025 Mizuki Yajima &nbsp;|&nbsp; Images © Respective Photographers<br>
+  Licensed under <a href="LICENSE.md">CC BY-SA 4.0</a>
+</footer>
+
+<!-- PhotoSwipe -->
+<script type="module">
+import PhotoSwipeLightbox from "https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.js";
+import {items} from './data.js';              // 画像メタ配列を読み込む
+
+// 1. グリッド生成
+const grid = document.getElementById('gallery');
+items.forEach(({src,w,h,alt})=>{
+  const a = document.createElement('a');
+  a.href = src; a.dataset.pswpWidth = w; a.dataset.pswpHeight = h;
+  a.innerHTML = `<img src="${src}" alt="${alt.ja}" loading="lazy">`;
+  grid.appendChild(a);
+});
+
+// 2. ライトボックス初期化
+const lightbox = new PhotoSwipeLightbox({
+  gallery:'#gallery',
+  children:'a',
+  pswpModule: ()=>import('https://unpkg.com/photoswipe@5/dist/photoswipe.esm.js')
+});
+lightbox.on('uiRegister', () => {
+  lightbox.pswp.ui.registerElement({
+    name:'alt-text',
+    order:9,
+    isButton:false,
+    appendTo:'root',
+    html:'',             // キャプション用
+    onInit:(_, el, pswp)=>{
+      pswp.on('change', ()=> {
+        const idx = pswp.currIndex;
+        el.textContent = items[idx].alt.ja + ' / ' + items[idx].alt.en;
+      });
+    }
+  });
+});
+lightbox.init();
+</script>
+</body>
+</html>
