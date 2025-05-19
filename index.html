@@ -1,109 +1,150 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Pavilion Gallery</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="五月祭パビリオン制作風景ギャラリー">
-  <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="五月祭パビリオン制作風景ギャラリー" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/photoswipe@5/dist/photoswipe.css"
+  />
   <style>
-    body{font-family:system-ui, sans-serif;margin:0;background:#f9f9f9}
-    header{padding:2rem 1rem;text-align:center}
-    h1{margin:0;font-size:clamp(1.5rem,4vw,2.2rem)}
-    .grid{display:grid;gap:8px;padding:0 8px;
-          grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-    .grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
-    footer{font-size:.8rem;text-align:center;padding:2rem 0;color:#666}
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      background: #f9f9f9;
+    }
+    header {
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+    }
+    .grid {
+      display: grid;
+      gap: 8px;
+      padding: 0 8px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    .grid img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    footer {
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 2rem 0;
+      color: #666;
+    }
   </style>
 </head>
 <body>
-<header>
-  <h1>Pavilion Gallery</h1>
-  <p>2025 五月祭 &bull; Construction snapshots</p>
-</header>
+  <header>
+    <h1>Pavilion Gallery</h1>
+    <p>2025 五月祭パビリオン-噛嵌 &bull; Construction snapshots</p>
+  </header>
 
-<main class="grid" id="gallery"></main>
+  <main class="grid" id="gallery"></main>
 
-<footer>
-  &copy; 2025 Mizuki Yajima &nbsp;|&nbsp; Images © Respective Photographers<br>
-  Licensed under <a href="LICENSE.md">CC BY-SA 4.0</a>
-</footer>
+  <footer>
+    &copy; 2025 Mizuki Yajima | Images © Respective Photographers<br />
+    Licensed under <a href="LICENSE.md">CC BY-SA 4.0</a>
+  </footer>
 
-<!-- PhotoSwipe -->
-<script type="module">
-import PhotoSwipeLightbox from "https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.js";
-import {items} from './data.js';              // 画像メタ配列を読み込む
+  <!-- PhotoSwipe -->
+  <script type="module">
+    import PhotoSwipeLightbox from
+      "https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.js";
+    import { items } from "./data.js"; // 画像／動画メタ配列
 
-// 1. グリッド生成
-const grid = document.getElementById('gallery');
-items.forEach(item=>{
-  const a = document.createElement('a');
+    const grid = document.getElementById("gallery");
 
-  if (item.type === "image") {
-    a.href = item.src;
-    a.dataset.pswpWidth = item.w;
-    a.dataset.pswpHeight = item.h;
-    a.innerHTML = `<img src="${item.src}" alt="${item.alt.ja}" loading="lazy">`;
-
-  } else if (item.type === "video") {
-    // 動画はポスター画像をグリッドに並べる
-    a.href = "#";               // または javascript:void(0)
-    a.dataset.type = "video";           // カスタムフラグ
-    a.innerHTML = `<img src="${item.poster}" alt="${item.alt.ja}" loading="lazy">`;
-  }
-
-  grid.appendChild(a);
-});
-
-
-// 2. ライトボックス初期化
-const lightbox = new PhotoSwipeLightbox({
-  gallery:'#gallery',
-  children:'a',
-  pswpModule: ()=>import('https://unpkg.com/photoswipe@5/dist/photoswipe.esm.js')
-});
-lightbox.on('contentLoad', (e) => {
-  const { pswpSlide } = e;
-  const item = items[pswpSlide.index];
-
-  if (item.type === 'video') {
-    /** 1. 動画要素を生成 **/
-    const video = document.createElement('video');
-    video.controls = true;
-    video.style.width = '100%';
-    video.setAttribute('playsinline', '');
-    video.setAttribute('preload', 'metadata');
-    video.innerHTML = `
-      <source src="${item.srcWebm}" type="video/webm">
-      <source src="${item.srcMp4}"  type="video/mp4">
-      ${item.alt.ja}
-    `;
-
-    /** 2. スライドに差し替え **/
-    pswpSlide.data.content = {        // PhotoSwipe 5: custom content
-      type: 'html',
-      html: video
-    };
-  }
-});
-
-lightbox.on('uiRegister', () => {
-  lightbox.pswp.ui.registerElement({
-    name:'alt-text',
-    order:9,
-    isButton:false,
-    appendTo:'root',
-    html:'',
-    onInit:(_, el, pswp)=>{
-      pswp.on('change', ()=>{
-        const i = pswp.currIndex;
-        el.textContent = items[i].alt.ja + ' / ' + items[i].alt.en;
+    /* ========= 1) 画像の寸法を先に取得 ========= */
+    const preloadPromises = items.map((item) => {
+      if (item.type !== "image") return Promise.resolve();
+      return new Promise((res) => {
+        const img = new Image();
+        img.src = item.src;
+        img.onload = () => {
+          item.w = img.naturalWidth;
+          item.h = img.naturalHeight;
+          res();
+        };
       });
-    }
-  });
-});
+    });
 
-lightbox.init();
-</script>
+    /* ========= 2) すべて揃ったら描画 → Lightbox ========= */
+    Promise.all(preloadPromises).then(() => {
+      // グリッド生成
+      items.forEach((item) => {
+        const a = document.createElement("a");
+
+        if (item.type === "image") {
+          a.href = item.src;
+          a.dataset.pswpWidth = item.w;
+          a.dataset.pswpHeight = item.h;
+          a.innerHTML = `<img src="${item.src}" alt="${item.alt.ja}" loading="lazy">`;
+        } else if (item.type === "video") {
+          a.href = "#"; // 直接DL防止
+          a.dataset.type = "video";
+          a.innerHTML = `<img src="${item.poster}" alt="${item.alt.ja}" loading="lazy">`;
+        }
+        grid.appendChild(a);
+      });
+
+      /* ---- PhotoSwipe ---- */
+      const lightbox = new PhotoSwipeLightbox({
+        gallery: "#gallery",
+        children: "a",
+        pswpModule: () =>
+          import("https://unpkg.com/photoswipe@5/dist/photoswipe.esm.js"),
+      });
+
+      /* ★動画ハンドラ */
+      lightbox.on("contentLoad", (e) => {
+        const { pswpSlide } = e;
+        const item = items[pswpSlide.index];
+
+        if (item.type === "video") {
+          const video = document.createElement("video");
+          video.controls = true;
+          video.style.width = "100%";
+          video.setAttribute("playsinline", "");
+          video.setAttribute("preload", "metadata");
+          video.innerHTML = `
+            <source src="${item.srcWebm}" type="video/webm">
+            <source src="${item.srcMp4}"  type="video/mp4">
+            ${item.alt.ja}
+          `;
+          pswpSlide.data.content = { type: "html", html: video };
+        }
+      });
+
+      /* ★ALT キャプション */
+      lightbox.on("uiRegister", () => {
+        lightbox.pswp.ui.registerElement({
+          name: "alt-text",
+          order: 9,
+          isButton: false,
+          appendTo: "root",
+          html: "",
+          onInit: (_, el, pswp) => {
+            pswp.on("change", () => {
+              const i = pswp.currIndex;
+              el.textContent =
+                items[i].alt.ja + " / " + items[i].alt.en;
+            });
+          },
+        });
+      });
+
+      lightbox.init();
+    });
+  </script>
 </body>
 </html>

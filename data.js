@@ -3,10 +3,24 @@ export const items = [
   {
     type: "image",
     src: "img/20250520_cut-with-cutom-jig.JPG",
-    w: 1600, h: 1067,
+    w: 5712, h: 4284,
     alt: { ja: "カスタム治具での切断", en: "Cutting with custom jig" },
     credit: "Photo: Yajima"
   },
+  {
+    type: "image",
+    src: "img/20250520_column.jpg",
+    w: 4284, h: 5712,
+    alt: { ja: "コラム", en: "Column" },
+    credit: "Photo: Yajima"
+  },
+  {
+    type: "image",
+    src: "img/20250520_mockup.jpg",
+    w: 4284, h: 5712,
+    alt: { ja: "モックアップ作成", en: "mockup" },
+    credit: "Photo: Yajima"
+  }
   /* === 動画 === */
   /*
   {
