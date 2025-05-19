@@ -112,6 +112,8 @@
 
         // <a> 要素は content.data.element に入っている
         const idx  = Number(content.data.element.dataset.idx);
+        console.log(idx);
+        console.log(content.data.element.dataset)
         const item = items[idx];
 
         if (item.type === 'video') {
