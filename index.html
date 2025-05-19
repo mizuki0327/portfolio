@@ -83,6 +83,7 @@
       // グリッド生成
       items.forEach((item) => {
         const a = document.createElement("a");
+        a.dataset.idx = i;  
 
         if (item.type === "image") {
           a.href = item.src;
@@ -106,28 +107,31 @@
       });
 
       /* ★動画ハンドラ */
-      lightbox.on("contentLoad", (e) => {
-        const { slide, content } = e; // ← 正しい取得方法
-        const item = items[slide.index]
+      lightbox.on('contentLoad', (e) => {
+        const { content } = e;
 
-        if (item.type === "video") {
+        // <a> 要素は content.data.element に入っている
+        const idx  = Number(content.data.element.dataset.idx);
+        const item = items[idx];
 
-            e.preventDefault();              // デフォルト画像ロードをキャンセル
-            const video = document.createElement("video");
+        if (item.type === 'video') {
+            e.preventDefault();             // 既定の画像ロードを止める
+
+            const video = document.createElement('video');
             video.controls = true;
-            video.style.width = "100%";
-            video.setAttribute("playsinline", "");
-            video.setAttribute("preload", "metadata");
+            video.style.width = '100%';
+            video.setAttribute('playsinline', '');
+            video.setAttribute('preload', 'metadata');
             video.innerHTML = `
-                <source src="${item.srcWebm}" type="video/webm">
-                <source src="${item.srcMp4}"  type="video/mp4">
-                ${item.alt.ja}
+            <source src="${item.srcWebm}" type="video/webm">
+            <source src="${item.srcMp4}"  type="video/mp4">
+            ${item.alt.ja}
             `;
-            // PhotoSwipe に渡す
-            pswpSlide.data.content = { type: "html", html: video };
-            content.element = video;
+
+            content.element = video;        // スライドに動画ノードを渡す
         }
-      });
+    });
+
 
       /* ★ALT キャプション */
       lightbox.on("uiRegister", () => {
