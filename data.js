@@ -1,13 +1,19 @@
 export const items = [
+  /* === 画像 === */
   {
-    src: "img/20250501_build-1.jpg",
-    w: 1600,            // 横幅
-    h: 1067,            // 縦幅
-    alt: {
-      ja: "シアキーを挿入する様子（右：矢島）",
-      en: "Inserting shear keys (right: Mizuki)"
-    },
-    credit: "Photo: Sato"
+    type: "image",
+    src: "img/20250520_cut-with-cutom-jig.JPG",
+    w: 1600, h: 1067,
+    alt: { ja: "カスタム治具での切断", en: "Cutting with custom jig" },
+    credit: "Photo: Yajima"
   },
-  // ここに続けて 20–30 枚
+  /* === 動画 === */
+  {
+    type: "video",
+    poster: "img/20250502_video-thumb.jpg",   // サムネ用静止画
+    srcMp4: "video/20250502_overview.mp4",
+    srcWebm: "video/20250502_overview.webm",
+    alt: { ja: "組立て全景タイムラプス", en: "Time-lapse of pavilion assembly" },
+    credit: "Video: Tanaka"
+  }
 ];

@@ -36,12 +36,25 @@ import {items} from './data.js';              // 画像メタ配列を読み込�
 
 // 1. グリッド生成
 const grid = document.getElementById('gallery');
-items.forEach(({src,w,h,alt})=>{
+items.forEach(item=>{
   const a = document.createElement('a');
-  a.href = src; a.dataset.pswpWidth = w; a.dataset.pswpHeight = h;
-  a.innerHTML = `<img src="${src}" alt="${alt.ja}" loading="lazy">`;
+
+  if (item.type === "image") {
+    a.href = item.src;
+    a.dataset.pswpWidth = item.w;
+    a.dataset.pswpHeight = item.h;
+    a.innerHTML = `<img src="${item.src}" alt="${item.alt.ja}" loading="lazy">`;
+
+  } else if (item.type === "video") {
+    // 動画はポスター画像をグリッドに並べる
+    a.href = item.srcMp4;               // ダミー（後で差し替え）
+    a.dataset.type = "video";           // カスタムフラグ
+    a.innerHTML = `<img src="${item.poster}" alt="${item.alt.ja}" loading="lazy">`;
+  }
+
   grid.appendChild(a);
 });
+
 
 // 2. ライトボックス初期化
 const lightbox = new PhotoSwipeLightbox({
@@ -49,21 +62,31 @@ const lightbox = new PhotoSwipeLightbox({
   children:'a',
   pswpModule: ()=>import('https://unpkg.com/photoswipe@5/dist/photoswipe.esm.js')
 });
-lightbox.on('uiRegister', () => {
-  lightbox.pswp.ui.registerElement({
-    name:'alt-text',
-    order:9,
-    isButton:false,
-    appendTo:'root',
-    html:'',             // キャプション用
-    onInit:(_, el, pswp)=>{
-      pswp.on('change', ()=> {
-        const idx = pswp.currIndex;
-        el.textContent = items[idx].alt.ja + ' / ' + items[idx].alt.en;
-      });
-    }
-  });
+lightbox.on('contentLoad', (e) => {
+  const { pswpSlide } = e;
+  const item = items[pswpSlide.index];
+
+  if (item.type === 'video') {
+    /** 1. 動画要素を生成 **/
+    const video = document.createElement('video');
+    video.controls = true;
+    video.style.width = '100%';
+    video.setAttribute('playsinline', '');
+    video.setAttribute('preload', 'metadata');
+    video.innerHTML = `
+      <source src="${item.srcWebm}" type="video/webm">
+      <source src="${item.srcMp4}"  type="video/mp4">
+      ${item.alt.ja}
+    `;
+
+    /** 2. スライドに差し替え **/
+    pswpSlide.data.content = {        // PhotoSwipe 5: custom content
+      type: 'html',
+      html: video
+    };
+  }
 });
+
 lightbox.init();
 </script>
 </body>
