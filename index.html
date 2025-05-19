@@ -106,9 +106,9 @@
       });
 
       /* ★動画ハンドラ */
-      lightbox.on("contentLoad", (e) => {
-        const { pswpSlide } = e;
-        const item = items[pswpSlide.index];
+      lightbox.on("contentLoad", ({ content }) => {
+        const idx  = content.slide.index; // ← 正しい取得方法
+        const item = items[idx];
 
         if (item.type === "video") {
           const video = document.createElement("video");
