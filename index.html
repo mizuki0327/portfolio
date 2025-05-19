@@ -81,7 +81,7 @@
     /* ========= 2) すべて揃ったら描画 → Lightbox ========= */
     Promise.all(preloadPromises).then(() => {
       // グリッド生成
-      items.forEach((item) => {
+      items.forEach((item, i) => {
         const a = document.createElement("a");
         a.dataset.idx = i;  
 
