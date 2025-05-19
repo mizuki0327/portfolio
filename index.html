@@ -106,22 +106,26 @@
       });
 
       /* ★動画ハンドラ */
-      lightbox.on("contentLoad", ({ content }) => {
-        const idx  = content.slide.index; // ← 正しい取得方法
-        const item = items[idx];
+      lightbox.on("contentLoad", (e) => {
+        const { slide, content } = e; // ← 正しい取得方法
+        const item = items[slide.index]
 
         if (item.type === "video") {
-          const video = document.createElement("video");
-          video.controls = true;
-          video.style.width = "100%";
-          video.setAttribute("playsinline", "");
-          video.setAttribute("preload", "metadata");
-          video.innerHTML = `
-            <source src="${item.srcWebm}" type="video/webm">
-            <source src="${item.srcMp4}"  type="video/mp4">
-            ${item.alt.ja}
-          `;
-          pswpSlide.data.content = { type: "html", html: video };
+
+            e.preventDefault();              // デフォルト画像ロードをキャンセル
+            const video = document.createElement("video");
+            video.controls = true;
+            video.style.width = "100%";
+            video.setAttribute("playsinline", "");
+            video.setAttribute("preload", "metadata");
+            video.innerHTML = `
+                <source src="${item.srcWebm}" type="video/webm">
+                <source src="${item.srcMp4}"  type="video/mp4">
+                ${item.alt.ja}
+            `;
+            // PhotoSwipe に渡す
+            pswpSlide.data.content = { type: "html", html: video };
+            content.element = video;
         }
       });
 
