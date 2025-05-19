@@ -47,7 +47,7 @@ items.forEach(item=>{
 
   } else if (item.type === "video") {
     // 動画はポスター画像をグリッドに並べる
-    a.href = item.srcMp4;               // ダミー（後で差し替え）
+    a.href = "#";               // または javascript:void(0)
     a.dataset.type = "video";           // カスタムフラグ
     a.innerHTML = `<img src="${item.poster}" alt="${item.alt.ja}" loading="lazy">`;
   }
@@ -85,6 +85,22 @@ lightbox.on('contentLoad', (e) => {
       html: video
     };
   }
+});
+
+lightbox.on('uiRegister', () => {
+  lightbox.pswp.ui.registerElement({
+    name:'alt-text',
+    order:9,
+    isButton:false,
+    appendTo:'root',
+    html:'',
+    onInit:(_, el, pswp)=>{
+      pswp.on('change', ()=>{
+        const i = pswp.currIndex;
+        el.textContent = items[i].alt.ja + ' / ' + items[i].alt.en;
+      });
+    }
+  });
 });
 
 lightbox.init();

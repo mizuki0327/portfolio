@@ -8,6 +8,7 @@ export const items = [
     credit: "Photo: Yajima"
   },
   /* === 動画 === */
+  /*
   {
     type: "video",
     poster: "img/20250502_video-thumb.jpg",   // サムネ用静止画
@@ -16,4 +17,5 @@ export const items = [
     alt: { ja: "組立て全景タイムラプス", en: "Time-lapse of pavilion assembly" },
     credit: "Video: Tanaka"
   }
+    */
 ];
