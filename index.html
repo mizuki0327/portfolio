@@ -143,7 +143,7 @@
           isButton: false,
           appendTo: "root",
           html: "",
-          onInit: (pswp, el) => {
+          onInit: ( el, pswp) => {
             pswp.on("change", () => {
               const i = pswp.currIndex;
               el.textContent =
