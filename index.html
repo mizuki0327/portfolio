@@ -85,11 +85,12 @@
         const a = document.createElement("a");
         a.dataset.idx = i;  
 
-        if (item.type === "image") {
-          a.href = item.src;
-          a.dataset.pswpWidth = item.w;
-          a.dataset.pswpHeight = item.h;
-          a.innerHTML = `<img src="${item.src}" alt="${item.alt.ja}" loading="lazy">`;
+        if (item.type === 'image') {
+            a.href = item.src;
+            a.dataset.pswpWidth  = item.w;
+            a.dataset.pswpHeight = item.h;
+            a.dataset.pswpCaption = `${item.alt.ja} / ${item.alt.en}`; // ←★ここ
+            a.innerHTML = `<img src="${item.src}" alt="${item.alt.ja}" loading="lazy">`;
         } else if (item.type === "video") {
           a.href = "#"; // 直接DL防止
           a.dataset.type = "video";
